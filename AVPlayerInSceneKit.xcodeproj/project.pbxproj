@@ -17,6 +17,9 @@
 		B123A17A251A117E000B5D74 /* video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = B123A177251A117E000B5D74 /* video.mp4 */; };
 		B123A17B251A117E000B5D74 /* video2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = B123A178251A117E000B5D74 /* video2.mp4 */; };
 		B148DCE4251C625500B0D0CC /* Methods.swift in Sources */ = {isa = PBXBuildFile; fileRef = B148DCE3251C625500B0D0CC /* Methods.swift */; };
+		B1611B0925232CB0009A839F /* ViewController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1611B0825232CB0009A839F /* ViewController2.swift */; };
+		B1CB6E6D2521DD7800D8FECE /* VideoRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CB6E6C2521DD7800D8FECE /* VideoRecorder.swift */; };
+		B1CB6E7B252206F100D8FECE /* SceneVideoExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CB6E7A252206F100D8FECE /* SceneVideoExporter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +35,9 @@
 		B123A177251A117E000B5D74 /* video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = video.mp4; sourceTree = "<group>"; };
 		B123A178251A117E000B5D74 /* video2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = video2.mp4; sourceTree = "<group>"; };
 		B148DCE3251C625500B0D0CC /* Methods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Methods.swift; sourceTree = "<group>"; };
+		B1611B0825232CB0009A839F /* ViewController2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController2.swift; sourceTree = "<group>"; };
+		B1CB6E6C2521DD7800D8FECE /* VideoRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoRecorder.swift; sourceTree = "<group>"; };
+		B1CB6E7A252206F100D8FECE /* SceneVideoExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneVideoExporter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +73,9 @@
 				B123A15E251A0FB0000B5D74 /* AppDelegate.swift */,
 				B123A160251A0FB0000B5D74 /* SceneDelegate.swift */,
 				B123A162251A0FB0000B5D74 /* ViewController.swift */,
+				B1CB6E7A252206F100D8FECE /* SceneVideoExporter.swift */,
+				B1CB6E6C2521DD7800D8FECE /* VideoRecorder.swift */,
+				B1611B0825232CB0009A839F /* ViewController2.swift */,
 				B148DCE3251C625500B0D0CC /* Methods.swift */,
 				B123A164251A0FB0000B5D74 /* Main.storyboard */,
 				B123A167251A0FB1000B5D74 /* Assets.xcassets */,
@@ -152,8 +161,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B1611B0925232CB0009A839F /* ViewController2.swift in Sources */,
 				B148DCE4251C625500B0D0CC /* Methods.swift in Sources */,
+				B1CB6E7B252206F100D8FECE /* SceneVideoExporter.swift in Sources */,
 				B123A163251A0FB0000B5D74 /* ViewController.swift in Sources */,
+				B1CB6E6D2521DD7800D8FECE /* VideoRecorder.swift in Sources */,
 				B123A15F251A0FB0000B5D74 /* AppDelegate.swift in Sources */,
 				B123A161251A0FB0000B5D74 /* SceneDelegate.swift in Sources */,
 			);
@@ -313,7 +325,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.rohansanap.POC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -333,7 +345,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.rohansanap.POC;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
