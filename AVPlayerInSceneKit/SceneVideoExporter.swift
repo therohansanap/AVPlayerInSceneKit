@@ -157,7 +157,7 @@ class SceneVideoExporter: NSObject {
     }
 
     let mediaTime = CMTime(seconds: time, preferredTimescale: 600)
-    self.forLoopQueue.sync {
+    self.forLoopQueue.async {
       let group = DispatchGroup()
 
       group.enter()
@@ -177,18 +177,18 @@ class SceneVideoExporter: NSObject {
       }
 
       group.wait()
+
+      self.renderer.sceneTime = time
+      self.renderer.render(
+        atTime: 0,
+        viewport: CGRect(origin: .zero, size: view.drawableSize),
+        commandBuffer: commandBuffer,
+        passDescriptor: renderPassDescriptor
+      )
+
+      commandBuffer.present(drawable)
+      commandBuffer.commit()
     }
-
-    renderer.sceneTime = time
-    renderer.render(
-      atTime: 0,
-      viewport: CGRect(origin: .zero, size: view.drawableSize),
-      commandBuffer: commandBuffer,
-      passDescriptor: renderPassDescriptor
-    )
-
-    commandBuffer.present(drawable)
-    commandBuffer.commit()
   }
 
 }

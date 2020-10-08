@@ -39,7 +39,7 @@
                                         <constraint firstAttribute="trailing" secondItem="x09-Hl-Ljq" secondAttribute="trailing" constant="20" id="smM-86-maV"/>
                                     </constraints>
                                 </view>
-                                <blurEffect style="dark"/>
+                                <blurEffect style="systemUltraThinMaterialDark"/>
                             </visualEffectView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dbj-Mv-jUo">
                                 <rect key="frame" x="20" y="763" width="30" height="30"/>
@@ -107,9 +107,9 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fzV-cT-epN">
-                                <rect key="frame" x="0.0" y="753" width="414" height="143"/>
+                                <rect key="frame" x="0.0" y="743" width="414" height="153"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="9W2-rM-qH1">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="143"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="153"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TgM-cY-jSZ">
@@ -126,15 +126,15 @@
                                 </view>
                                 <blurEffect style="systemUltraThinMaterialDark"/>
                             </visualEffectView>
-                            <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="c67-aM-1QJ">
-                                <rect key="frame" x="50" y="179" width="314" height="558"/>
+                            <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm_sRGB" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="c67-aM-1QJ">
+                                <rect key="frame" x="50" y="169" width="314" height="558"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="c67-aM-1QJ" secondAttribute="height" multiplier="9:16" id="rl7-Jw-8om"/>
                                 </constraints>
-                                <color key="clearColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="clearColor" red="0.0" green="0.97680455450000003" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </mtkView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VNL-ZZ-tOD">
-                                <rect key="frame" x="20" y="773" width="30" height="30"/>
+                                <rect key="frame" x="20" y="763" width="30" height="30"/>
                                 <state key="normal" title="Play"/>
                                 <connections>
                                     <action selector="playTapped:" destination="Lgv-y1-bIY" eventType="touchUpInside" id="cGO-yM-Mx6"/>
@@ -150,7 +150,7 @@
                             <constraint firstItem="fzV-cT-epN" firstAttribute="top" secondItem="c67-aM-1QJ" secondAttribute="bottom" constant="16" id="aIK-kP-lej"/>
                             <constraint firstItem="TgM-cY-jSZ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="VNL-ZZ-tOD" secondAttribute="trailing" constant="20" id="bzg-OP-sCm"/>
                             <constraint firstItem="fzV-cT-epN" firstAttribute="top" secondItem="VNL-ZZ-tOD" secondAttribute="top" constant="-20" id="dps-nr-IfJ"/>
-                            <constraint firstItem="VNL-ZZ-tOD" firstAttribute="bottom" secondItem="Dh7-xS-bPF" secondAttribute="bottom" constant="-10" id="fWT-xc-8p4"/>
+                            <constraint firstItem="VNL-ZZ-tOD" firstAttribute="bottom" secondItem="Dh7-xS-bPF" secondAttribute="bottom" constant="-20" id="fWT-xc-8p4"/>
                             <constraint firstItem="VNL-ZZ-tOD" firstAttribute="leading" secondItem="Dh7-xS-bPF" secondAttribute="leading" constant="20" id="fk0-wS-0Dd"/>
                             <constraint firstItem="TgM-cY-jSZ" firstAttribute="centerY" secondItem="VNL-ZZ-tOD" secondAttribute="centerY" id="mSt-wS-dvs"/>
                             <constraint firstItem="fzV-cT-epN" firstAttribute="leading" secondItem="fHo-xa-dOe" secondAttribute="leading" id="puh-dI-Jk8"/>

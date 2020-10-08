@@ -61,7 +61,7 @@ public func setupScene() -> (scene: SCNScene, player1: AVPlayer, player2: AVPlay
   cameraNode.position = SCNVector3(0, 0, 1662.9135)
   scene.rootNode.addChildNode(cameraNode)
 
-  scene.background.contents = UIColor.red
+  scene.background.contents = UIColor.green
 
   let translate200Animation = CABasicAnimation(keyPath: "transform.translation.y")
   translate200Animation.fromValue = 0
