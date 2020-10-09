@@ -27,7 +27,12 @@ class VideoRecorder {
     let outputSettings: [String: Any] = [
       AVVideoCodecKey : AVVideoCodecType.h264,
       AVVideoWidthKey : size.width,
-      AVVideoHeightKey : size.height
+      AVVideoHeightKey : size.height,
+      AVVideoColorPropertiesKey: [
+        AVVideoColorPrimariesKey: AVVideoColorPrimaries_ITU_R_709_2,
+        AVVideoTransferFunctionKey: AVVideoTransferFunction_ITU_R_709_2,
+        AVVideoYCbCrMatrixKey: AVVideoYCbCrMatrix_ITU_R_709_2
+      ]
     ]
 
     assetWriterVideoInput = AVAssetWriterInput(mediaType: .video, outputSettings: outputSettings)
@@ -80,6 +85,10 @@ class VideoRecorder {
     }
 
     guard let pixelBuffer = maybePixelBuffer else { return }
+//    CVBufferSetAttachment(pixelBuffer, kCVImageBufferColorPrimariesKey, kCVImageBufferColorPrimaries_P3_D65, .shouldPropagate)
+    CVBufferSetAttachment(pixelBuffer, kCVImageBufferColorPrimariesKey, kCVImageBufferColorPrimaries_ITU_R_709_2, .shouldPropagate)
+    CVBufferSetAttachment(pixelBuffer, kCVImageBufferTransferFunctionKey, kCVImageBufferTransferFunction_ITU_R_709_2, .shouldPropagate)
+    CVBufferSetAttachment(pixelBuffer, kCVImageBufferYCbCrMatrixKey, kCVImageBufferYCbCrMatrix_ITU_R_709_2, .shouldPropagate)
 
     CVPixelBufferLockBaseAddress(pixelBuffer, [])
     let pixelBufferBytes = CVPixelBufferGetBaseAddress(pixelBuffer)!
@@ -92,7 +101,7 @@ class VideoRecorder {
 
     let presentationTime = CMTimeMakeWithSeconds(time, preferredTimescale: 240)
     assetWriterPixelBufferInput.append(pixelBuffer, withPresentationTime: presentationTime)
-
+    print(pixelBuffer)
     CVPixelBufferUnlockBaseAddress(pixelBuffer, [])
   }
 }
