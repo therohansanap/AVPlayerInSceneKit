@@ -16,7 +16,7 @@ class ViewController2: UIViewController {
   var player1: AVPlayer!
   var player2: AVPlayer!
 
-  var currentTime: TimeInterval = -0.033
+  var currentTime: TimeInterval = -0.04
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -38,10 +38,9 @@ class ViewController2: UIViewController {
   }
 
   @IBAction func playTapped(_ sender: UIButton) {
-    self.currentTime += 0.033
+    self.currentTime += 0.04
     self.sceneVideoExporter?.drawIn(view: self.metalView, time: self.currentTime, completion: { (texture) in
-      print(texture.width, texture.height)
-      print(self.metalView.drawableSize)
+      //
     })
   }
 

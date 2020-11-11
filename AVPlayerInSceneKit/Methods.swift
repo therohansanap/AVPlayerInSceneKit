@@ -27,7 +27,7 @@ public func setupScene() -> (scene: SCNScene, player1: AVPlayer, player2: AVPlay
   let plane1 = SCNPlane(width: 540, height: 960)
   let material1 = SCNMaterial()
 
-  let asset1 = AVAsset(url: Bundle.main.url(forResource: "video1", withExtension: "mp4")!)
+  let asset1 = AVAsset(url: Bundle.main.url(forResource: "video1-25", withExtension: "mp4")!)
   let playerItem1 = AVPlayerItem(asset: asset1)
   let player1 = AVPlayer()
   player1.replaceCurrentItem(with: playerItem1)
@@ -42,7 +42,7 @@ public func setupScene() -> (scene: SCNScene, player1: AVPlayer, player2: AVPlay
   let plane2 = SCNPlane(width: 540, height: 960)
   let material2 = SCNMaterial()
 
-  let asset2 = AVAsset(url: Bundle.main.url(forResource: "video", withExtension: "mp4")!)
+  let asset2 = AVAsset(url: Bundle.main.url(forResource: "video-25", withExtension: "mp4")!)
   let playerItem2 = AVPlayerItem(asset: asset2)
   let player2 = AVPlayer()
   player2.replaceCurrentItem(with: playerItem2)

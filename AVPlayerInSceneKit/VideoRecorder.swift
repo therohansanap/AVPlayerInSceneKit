@@ -101,7 +101,6 @@ class VideoRecorder {
 
     let presentationTime = CMTimeMakeWithSeconds(time, preferredTimescale: 240)
     assetWriterPixelBufferInput.append(pixelBuffer, withPresentationTime: presentationTime)
-    print(pixelBuffer)
     CVPixelBufferUnlockBaseAddress(pixelBuffer, [])
   }
 }

@@ -35,6 +35,31 @@ class SceneVideoExporter: NSObject {
   let player1: AVPlayer
   let player2: AVPlayer
 
+  let assetReader1: AVAssetReader
+  let trackOutput1: AVAssetReaderTrackOutput
+
+  let assetReader2: AVAssetReader
+  let trackOutput2: AVAssetReaderTrackOutput
+
+  let node1: SCNNode
+  let node2: SCNNode
+
+  var counter = 0
+
+  lazy var img1: UIImage = {
+    let url = Bundle.main.url(forResource: "img-1", withExtension: "JPG")!
+    let data = try! Data(contentsOf: url)
+    return UIImage(data: data)!
+  }()
+
+  lazy var img2: UIImage = {
+    let url = Bundle.main.url(forResource: "img-2", withExtension: "JPG")!
+    let data = try! Data(contentsOf: url)
+    return UIImage(data: data)!
+  }()
+
+  var textureCache: CVMetalTextureCache?
+
   init(scene: SCNScene, duration: Double, player1: AVPlayer, player2: AVPlayer) {
     self.scene = scene
     self.duration = duration
@@ -46,6 +71,28 @@ class SceneVideoExporter: NSObject {
     self.commandQueue = self.device.makeCommandQueue()!
     self.player1 = player1
     self.player2 = player2
+
+    self.node1 = scene.rootNode.childNode(withName: "1", recursively: false)!
+    self.node2 = scene.rootNode.childNode(withName: "2", recursively: false)!
+
+    let outputSettings: [String: Any] = [
+      kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
+      kCVPixelBufferMetalCompatibilityKey as String: true
+    ]
+
+    let asset1 = player1.currentItem!.asset
+    self.assetReader1 = try! AVAssetReader(asset: asset1)
+    let track1 = asset1.tracks(withMediaType: .video).first!
+    self.trackOutput1 = AVAssetReaderTrackOutput(track: track1, outputSettings: outputSettings)
+    self.assetReader1.add(self.trackOutput1)
+    self.assetReader1.startReading()
+
+    let asset2 = player2.currentItem!.asset
+    self.assetReader2 = try! AVAssetReader(asset: asset2)
+    let track2 = asset2.tracks(withMediaType: .video).first!
+    self.trackOutput2 = AVAssetReaderTrackOutput(track: track2, outputSettings: outputSettings)
+    self.assetReader2.add(self.trackOutput2)
+    self.assetReader2.startReading()
 
     let textureDescriptor = MTLTextureDescriptor.texture2DDescriptor(
       pixelFormat: .bgra8Unorm_srgb,
@@ -65,58 +112,49 @@ class SceneVideoExporter: NSObject {
 
     self.videoRecorder = VideoRecorder(size: CGSize(width: width, height: height))!
 
+    guard CVMetalTextureCacheCreate(kCFAllocatorDefault, nil, self.device, nil, &self.textureCache) == kCVReturnSuccess
+      else { fatalError() }
+
     super.init()
   }
 
   func exportVideo() {
-    self.forLoopQueue.async {
-      let date = Date()
-      self.videoRecorder.startRecording()
-      for time in stride(from: 0, to: self.duration, by: 0.033) {
+    let date = Date()
+    self.videoRecorder.startRecording()
+    for time in stride(from: 0, to: self.duration, by: 0.04) {
+      autoreleasepool {
         print("Iteration for: \(time)s")
         let nextTime = time
-        let nextMediaTime = CMTime(seconds: nextTime, preferredTimescale: 600)
 
-        let group = DispatchGroup()
+        let sampleBuffer1 = self.trackOutput1.copyNextSampleBuffer()
+        let pixelBuffer1 = CMSampleBufferGetImageBuffer(sampleBuffer1!)! as CVPixelBuffer
+        let texture1 = self.buildTextureForPixelBuffer(pixelBuffer1)!
+        self.node1.geometry?.firstMaterial?.diffuse.contents = texture1
 
-        group.enter()
-        self.seekingQueue.async {
-          self.player1.seek(to: nextMediaTime, toleranceBefore: .zero, toleranceAfter: .zero) { (finished) in
-            print("Player1 seek complete - \(finished)")
-            self.seekingQueue.async { group.leave() }
-          }
-        }
-
-        group.enter()
-        self.seekingQueue.async {
-          self.player2.seek(to: nextMediaTime, toleranceBefore: .zero, toleranceAfter: .zero) { (finished) in
-            print("Player2 seek complete - \(finished)")
-            self.seekingQueue.async { group.leave() }
-          }
-        }
-
-        group.wait()
+        let sampleBuffer2 = self.trackOutput2.copyNextSampleBuffer()
+        let pixelBuffer2 = CMSampleBufferGetImageBuffer(sampleBuffer2!)! as CVPixelBuffer
+        let texture2 = self.buildTextureForPixelBuffer(pixelBuffer2)!
+        self.node2.geometry?.firstMaterial?.diffuse.contents = texture2
 
         print("All player seek invoked completion block")
 
+        let group = DispatchGroup()
         group.enter()
-        self.exportQueue.async {
-          self.draw(target: self.target, time: nextTime) { (texture) in
-            print("render pass complete")
-            self.videoRecorder.writeFrame(forTexture: texture, time: nextTime)
-            print("frame write complete")
-            group.leave()
-          }
+        self.draw(target: self.target, time: nextTime) { (texture) in
+          print("render pass complete")
+          self.videoRecorder.writeFrame(forTexture: texture, time: nextTime)
+          print("frame write complete")
+          group.leave()
         }
 
         group.wait()
         print("-------------------------------")
       }
+    }
 
-      self.videoRecorder.endRecording {
-        print("****************")
-        printTime(since: date)
-      }
+    self.videoRecorder.endRecording {
+      print("****************")
+      printTime(since: date)
     }
   }
 
@@ -144,51 +182,73 @@ class SceneVideoExporter: NSObject {
   }
 
   func drawIn(view: MTKView, time: TimeInterval, completion: @escaping (MTLTexture) -> Void) {
+    print("================")
+    print(time)
     view.device = self.device
 
     guard let drawable = view.currentDrawable,
           let commandBuffer = commandQueue.makeCommandBuffer(),
-          let renderPassDescriptor = view.currentRenderPassDescriptor else {
+          let renderPassDescriptor = view.currentRenderPassDescriptor,
+          let commandEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
       return
     }
+
+    commandEncoder.endEncoding()
 
     commandBuffer.addCompletedHandler { (_) in
       completion(drawable.texture)
     }
 
-    let mediaTime = CMTime(seconds: time, preferredTimescale: 600)
-    self.forLoopQueue.async {
-      let group = DispatchGroup()
+    let sampleBuffer1 = self.trackOutput1.copyNextSampleBuffer()!
+    let pixelBuffer1 = CMSampleBufferGetImageBuffer(sampleBuffer1)! as CVPixelBuffer
+    print(CMTimeGetSeconds(sampleBuffer1.presentationTimeStamp))
+    let texture1 = self.buildTextureForPixelBuffer(pixelBuffer1)!
+    self.node1.geometry?.firstMaterial?.diffuse.contents = texture1
 
-      group.enter()
-      self.seekingQueue.async {
-        self.player1.seek(to: mediaTime, toleranceBefore: .zero, toleranceAfter: .zero) { (finished) in
-          print("Player 1 seeked - \(finished)")
-          self.seekingQueue.async { group.leave() }
-        }
-      }
+    let sampleBuffer2 = self.trackOutput2.copyNextSampleBuffer()!
+    let pixelBuffer2 = CMSampleBufferGetImageBuffer(sampleBuffer2)! as CVPixelBuffer
+    print(CMTimeGetSeconds(sampleBuffer2.presentationTimeStamp))
+    let texture2 = self.buildTextureForPixelBuffer(pixelBuffer2)!
+    self.node2.geometry?.firstMaterial?.diffuse.contents = texture2
 
-      group.enter()
-      self.seekingQueue.async {
-        self.player2.seek(to: mediaTime, toleranceBefore: .zero, toleranceAfter: .zero) { (finished) in
-          print("Player 2 seeked - \(finished)")
-          self.seekingQueue.async { group.leave() }
-        }
-      }
+    self.renderer.sceneTime = time
+    self.renderer.render(
+      atTime: 0,
+      viewport: CGRect(origin: .zero, size: view.drawableSize),
+      commandBuffer: commandBuffer,
+      passDescriptor: renderPassDescriptor
+    )
 
-      group.wait()
+    commandBuffer.present(drawable)
+    commandBuffer.commit()
+  }
 
-      self.renderer.sceneTime = time
-      self.renderer.render(
-        atTime: 0,
-        viewport: CGRect(origin: .zero, size: view.drawableSize),
-        commandBuffer: commandBuffer,
-        passDescriptor: renderPassDescriptor
-      )
+  func buildTextureForPixelBuffer(_ pixelBuffer: CVPixelBuffer) -> MTLTexture? {
+    let width = CVPixelBufferGetWidthOfPlane(pixelBuffer, 0)
+    let height = CVPixelBufferGetHeightOfPlane(pixelBuffer, 0)
 
-      commandBuffer.present(drawable)
-      commandBuffer.commit()
-    }
+    guard let metalTextureCache = textureCache else { return nil }
+
+    var texture: CVMetalTexture?
+    /*
+     CVMetalTextureCacheCreateTextureFromImage is used to create a Metal texture (CVMetalTexture) from a
+     CVPixelBuffer (or more precisely, a texture from the IOSurface that backs a CVPixelBuffer).
+
+     Note: Calling CVMetalTextureCacheCreateTextureFromImage does not increment the use count of the
+     IOSurface; only the CVPixelBuffer, and the CVMTLTexture own this IOSurface. At least one of the two
+     must be retained until Metal rendering is done. The MTLCommandBuffer completion handler is good for
+     this purpose.
+     */
+    let status =
+      CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault, metalTextureCache, pixelBuffer, nil,
+                                                MTLPixelFormat.bgra8Unorm, width, height, 0, &texture)
+    if status == kCVReturnSuccess {
+      guard let textureFromImage = texture else { return nil }
+
+      guard let metalTexture = CVMetalTextureGetTexture(textureFromImage) else { return nil }
+
+      return metalTexture
+    } else { return nil }
   }
 
 }
